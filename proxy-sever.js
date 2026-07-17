@@ -1,17 +1,17 @@
-// proxy-server.js - RENDER VERSION
+// proxy-server.js - RENDER SERVER
 const http = require('http');
 const https = require('https');
 const url = require('url');
 
-// ⭐ Render එක auto assign කරන PORT එක පාවිච්චි කරන්න
 const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
-    // CORS headers
+    // CORS headers - මේක තමයි වැදගත්!
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, User-Agent, Accept, Cache-Control');
 
+    // OPTIONS request (CORS preflight)
     if (req.method === 'OPTIONS') {
         res.writeHead(200);
         res.end();
@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({
             status: 'ok',
             timestamp: new Date().toISOString(),
-            message: 'Proxy server is running on Render!'
+            message: 'Proxy server is running!'
         }));
         return;
     }
@@ -64,12 +64,10 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log('='.repeat(50));
-    console.log('✅ PROXY SERVER IS RUNNING!');
+    console.log('✅ PROXY SERVER RUNNING!');
     console.log('='.repeat(50));
     console.log(`📌 Port: ${PORT}`);
-    console.log(`🔄 Proxy endpoint: /proxy?url=https://example.com`);
-    console.log(`💚 Health check: /health`);
-    console.log('='.repeat(50));
-    console.log('⚠️  මෙය අධ්‍යාපනික අරමුණු සඳහා පමණයි!');
+    console.log(`🔄 Proxy: /proxy?url=https://example.com`);
+    console.log(`💚 Health: /health`);
     console.log('='.repeat(50));
 });
